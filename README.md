@@ -3,5 +3,6 @@
 ## Projects
 * [X] 📖 [CLI Booking App](https://github.com/devoure/go-mini-projects/tree/main/booking-app)
 * [X] 🌐 [Web Server](https://github.com/devoure/go-mini-projects/tree/main/yanited-fans)
+* [X] :mailbox_with_mail: [CRUD API](https://github.com/devoure/go-mini-projects/tree/main/muvi-watchlist)
 
   
