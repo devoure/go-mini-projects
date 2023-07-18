@@ -18,6 +18,7 @@
       <summary>
        Postman Screenshot
       </summary>
+       
       ![postman get one image](./images/getone.png)
      </details>
   1. /watchlist/add (POST) endpoint
@@ -26,6 +27,7 @@
       <summary>
        Postman Screenshot
       </summary>
+       
       ![postman add a moviel](./images/add.png)
      </details>
   1. /watchlist/{id} (DELETE) endpoint
@@ -34,6 +36,7 @@
       <summary>
        Postman Screenshot
       </summary>
+       
       ![postman update](./images/delete.png)
      </details>
   1. /watchlist/{id} (PUT/UPDATE) endpoint
@@ -42,18 +45,19 @@
       <summary>
        Postman Screenshot
       </summary>
+       
       ![postman update](./images/put.png)
      </details>
 
 ## 🔧 Code Setup
    1. Clone the repo
         ```
-            git clone 
+            git clone https://github.com/devoure/go-mini-projects.git
 
         ```
    1. Move into the project file
         ```bash
-            cd yanited-fans
+            cd muvi-watchlist
 
         ```
    1. Install the dependecies
