@@ -5,5 +5,6 @@
 * [X] 🌐 [Web Server](https://github.com/devoure/go-mini-projects/tree/main/yanited-fans)
 * [X] :mailbox_with_mail: [CRUD API](https://github.com/devoure/go-mini-projects/tree/main/muvi-watchlist)
 * [X] :books: [SQL CRUD API](https://github.com/devoure/go-mini-projects/tree/main/vitabu)
+* [X] :moyai: [TEXT SLACK BOT](https://github.com/devoure/go-mini-projects/tree/main/devteam-banter)
 
   
