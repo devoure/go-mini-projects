@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -19,7 +21,7 @@ type MongoInstance struct {
 var mg MongoInstance
 
 const dbName = "wadau-hrms"
-const mongoURI = "mongodb://devoure:password4devoure@localhost:27017/" + dbName
+const mongoURI = "mongodb://admin:admin@localhost:27017/"
 
 type Employee struct {
 	// when field is empty then the field will be ignored
@@ -80,55 +82,70 @@ func addNewEmployee(c *fiber.Ctx) error {
 
 	if err != nil {
 		return c.Status(500).SendString(err.Error())
-		}
-		filter := bson.D{{Key: "_id", Value: insertionResult.InsertedID}}
-		createdRecord := collection.FindOne(c.Context(), filter)
-		createdEmployee := &Employee{}
-		createdRecord.Decode(createdEmployee)
+	}
+	filter := bson.D{{Key: "_id", Value: insertionResult.InsertedID}}
+	createdRecord := collection.FindOne(c.Context(), filter)
+	createdEmployee := &Employee{}
+	createdRecord.Decode(createdEmployee)
 
-		return c.Status(201).JSON(createdEmployee)
+	return c.Status(201).JSON(createdEmployee)
 }
 
-func updateRecord(c *fiber.Ctx)(error){
-		idParam := c.Params("id")
+func updateRecord(c *fiber.Ctx) error {
+	idParam := c.Params("id")
 
-		employeeID, err := primitive.ObjectIDFromHex(idParam)
+	employeeID, err := primitive.ObjectIDFromHex(idParam)
 
-		if err != nil {
+	if err != nil {
+		return c.SendStatus(400)
+	}
+
+	employee := new(Employee)
+
+	if err := c.BodyParser(employee); err != nil {
+		return c.Status(400).SendString(err.Error())
+	}
+
+	query := bson.D{{Key: "_id", Value: employeeID}}
+	update := bson.D{
+		{Key: "$set",
+			Value: bson.D{
+				{Key: "name", Value: employee.Name},
+				{Key: "age", Value: employee.Age},
+				{Key: "salary", Value: employee.Salary},
+			},
+		},
+	}
+	err = mg.Db.Collection("employees").FindOneAndUpdate(c.Context(), query, update).Err()
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
 			return c.SendStatus(400)
 		}
+		return c.SendStatus(500)
+	}
 
-		employee := new(Employee)
+	employee.ID = idParam
 
-		if err := c.BodyParser(employee); err != nil {
-			return c.Status(400).SendString(err.Error())
-		}
+	return c.Status(200).JSON(employee)
+}
 
-		query := bson.D{{Key: "_id", Value: employeeID}}
-		update := bson.D{
-			{Key: "$set",
-				Value: bson.D{
-					{Key: "name", Value: employee.Name},
-					{Key: "age", Value: employee.Age},
-					{Key: "salary", Value: employee.Salary},
-				},
-			},
-		}
+func deleteRecord(c *fiber.Ctx) error {
+	employeeID, err := primitive.ObjectIDFromHex(c.Params("id"))
 
-		err = mg.Db.Collection("employees").FindOneAndUpdate(c.Context(), query, update).Err()
+	if err != nil {
+		return c.SendStatus(400)
+	}
+	query := bson.D{{Key: "_id", Value: employeeID}}
+	result, err := mg.Db.Collection("employees").DeleteOne(c.Context(), &query)
+	if err != nil {
+		return c.SendStatus(500)
+	}
 
-		if err != nil {
-			if err == mongo.ErrNoDocuments {
-				return c.SendStatus(400)
-			}
-			return c.SendStatus(500)
-		}
-
-		employee.ID = idParam
-
-		return c.Status(200).JSON(employee)
-
-	})
+	if result.DeletedCount < 1 {
+		return c.SendStatus(404)
+	}
+	return c.Status(200).JSON("record deleted")
 }
 
 func main() {
@@ -137,5 +154,11 @@ func main() {
 		log.Fatal(err)
 	}
 	app := fiber.New()
+	app.Get("/employees/", getEmployeeData)
+	app.Post("/employees/add/", addNewEmployee)
+	app.Put("/employees/update/:id", updateRecord)
+	app.Delete("/employees/delete/:id", deleteRecord)
 
+	fmt.Println(">>> Starting server at port 3000")
+	log.Fatal(app.Listen(":3000"))
 }

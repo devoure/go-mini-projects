@@ -1,22 +1,21 @@
-version: '3'
+version: '3.7'
+
 services:
-  mongodb:
+
+  mongo:
     image: mongo
     restart: always
     ports:
       - 27017:27017
     environment:
-      MONGO_INITDB_ROOT_USERNAME: devoure
-      MONGO_INITDB_ROOT_PASSWORD: password4devoure
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
 
   mongo-express:
     image: mongo-express
+    restart: always
     ports:
-      - 8081:8081
+      - 8080:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: devoure
-      ME_CONFIG_MONGODB_ADMINPASSWORD: password4devoure
-      ME_CONFIG_MONGODB_SERVER: mongodb
-    depends_on:
-      - mongodb
-
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
